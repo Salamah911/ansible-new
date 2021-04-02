@@ -1,0 +1,12 @@
+---
+ txtfiles:
+  - {path: /home/test.txt}
+  - {path: /home/salameh.txt}
+  - {path: /opt/testmachine.txt}
+ xmlfiles:
+  - { path: /home/salameh/testfile.xml }
+  - { path: /home/salameh1.xml }
+ yaml:
+  - { path: /home/test1.yaml }
+  - { path: /home/test2.yaml }
+  - { path: /home/test3.yaml }

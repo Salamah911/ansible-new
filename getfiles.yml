@@ -1,0 +1,10 @@
+---
+    - find: 
+        paths: "/home/ansadmin/Desktop/{{dir1}}/{{item}}"
+        recurse: yes
+      register: files
+    - include_tasks: getdiff.yml
+      with_filetree: /home/ansadmin/Desktop/{{dir1}}/{{item}}/ 
+      loop_control:
+       loop_var: file_item
+      when: file_item.state == 'file'

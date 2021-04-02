@@ -1,0 +1,43 @@
+---
+ - name: diff in {{ file_item.src.split('/')[-1] }}
+   copy:
+    src: "{{ file_item.src }}"
+    dest: "/home/ansadmin/Desktop/{{ dir2 }}/{{ item }}"
+    force: yes
+   diff: yes
+   register: differ
+   check_mode: yes
+ - debug: msg="{{ differ }}"
+ - lineinfile: 
+    path: "/home/ansadmin/Desktop/diff.txt"
+    line: "{{ differ.diff }}'\n"
+   when: differ.gid is not defined
+ - name: acl in {{ file_item.src }}
+   acl: 
+    name: "{{file_item.src}}"
+   register: acl_info1
+ - name: acl in /home/ansadmin/Desktop/{{dir2}}/{{item}}/{{file_item.src.split('/')[-1]}}
+   acl: 
+    name: "/home/ansadmin/Desktop/{{dir2}}/{{item}}/{{file_item.src.split('/')[-1]}}"
+   register: acl_info2
+ - lineinfile:
+    path: "/home/ansadmin/Desktop/permissions.txt"
+
+    line: "before:{{acl_info1.acl}}, after:{{acl_info2.acl}} , -> {{item}}/{{file_item.path}}'\n"
+   when: acl_info1 != acl_info2
+
+ - file: 
+    path: "{{file_item.src}}"
+    state: file
+   register: rg1
+
+ - file:
+    path: "/home/ansadmin/Desktop/{{dir2}}/{{item}}/{{file_item.src.split('/')[-1]}}"
+    state: file
+   register: rg2
+
+ - lineinfile: 
+    path: "/home/ansadmin/Desktop/secontexts.txt"
+    line: "[ {{rg1.secontext}} - {{rg1.path}} ]::[ {{rg2.secontext}} - {{rg2.path}} ]'\n"
+   when: rg1.secontext != rg2.secontext
+

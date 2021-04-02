@@ -1,0 +1,46 @@
+---
+ - gather_facts: no
+   hosts: localhost
+   vars_files: hosts.yml
+   vars_prompt: 
+    - name: dir1
+      prompt: what is the name of your first backup? note - just insert the directory name
+      private: no
+    - name: dir2
+      prompt: what is the name of your second backup? note - just insert the directory name
+      private: no
+   tasks:
+    - file:
+       path: /home/ansadmin/Desktop/diff.txt
+       state: absent
+    - file:
+       path: /home/ansadmin/Desktop/permissions.txt
+       state: absent
+    - file:
+       path: /home/ansadmin/Desktop/secontexts.txt
+       state: absent
+    - file:
+       path: "/home/ansadmin/Desktop/diff.txt"
+       state: touch
+    - file: 
+       path: "/home/ansadmin/Desktop/permissions.txt"
+       state: touch
+    - file:
+       path: "/home/ansadmin/Desktop/secontexts.txt"
+       state: touch
+    - include_vars:
+        file: vars.yml
+        name: paths
+    - name: comparing
+      find:
+        paths: "/home/ansadmin/Desktop/{{ dir1 }}/salameh@192.168.56.4"
+        recurse: yes
+      register: find_results
+    - include_tasks: getfiles.yml
+      with_items: "{{ hosts }}"
+
+    - debug: msg="------------------------------------------------"
+      with_file:
+        - "/home/ansadmin/Desktop/diff.txt" 
+        - "/home/ansadmin/Desktop/permissions.txt"
+        - "/home/ansadmin/Desktop/secontexts.txt"

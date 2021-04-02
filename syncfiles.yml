@@ -1,0 +1,25 @@
+---
+ - gather_facts: no
+   hosts: all
+   vars_prompt:
+    - name: dir
+      prompt: what is the name of your backup ? note - just insert the directory name
+      private: no
+   tasks:
+    - include_vars: 
+        file: ./vars.yml
+        name: paths
+    - file: 
+       path: /home/ansadmin/Desktop/{{ dir }}
+       state: directory
+      delegate_to: localhost
+    - debug: 
+       msg: "{{ item.1.path }}"
+      loop: "{{ paths | dict2items | subelements('value') }}"
+    - name: print
+      fetch:
+        src: "{{ item.1.path }}"
+        dest: /home/ansadmin/Desktop/{{ dir }}/{{ inventory_hostname }}/
+        fail_on_missing: no
+        flat: yes
+      loop: "{{ paths | dict2items | subelements('value') }}"
